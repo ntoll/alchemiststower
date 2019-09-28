@@ -22,6 +22,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+from kivy.config import Config
+Config.set('graphics', 'resizable', False)
 import kivy
 
 kivy.require("1.11.1")
@@ -170,6 +172,10 @@ class Card:
         self.button_widgets = []
         # Will become a reference to any scheduled auto advance transition.
         self.auto_event = None
+        # The sound player for this card.
+        self.player = None
+        # The custom font for this card.
+        self.font = None
         self._verify()
 
     def _verify(self):
@@ -286,9 +292,6 @@ class Card:
         # The main layout that defines how UI elements are drawn.
         self.layout = BoxLayout(orientation="vertical")
         screen.add_widget(self.layout)
-        # The sound player for this card.
-        self.player = None
-        # Text font size for the Screen instance.
         self.font_size = "{}sp".format(self.text_size)
         if self.form:
             self._draw_form()
@@ -320,13 +323,14 @@ class Card:
         Encompasses the drawing of a single textual block onto the card.
         """
         self.text_label = Label(
-            text=self.text, font_size=self.font_size, markup=True
+            text=self.text, font_size=self.font_size, font_name=self.font,
+            markup=True
         )
         self.text_label.color = list(self.text_color)
         self.text_label.padding = 10, 10
         self.text_label.text_size = (Window.width, Window.height)
         self.text_label.valign = "middle"
-        self.text_label.halign = "center"
+        self.text_label.halign = "left"
         self.layout.add_widget(self.text_label)
 
     def _draw_form(self):
@@ -336,9 +340,12 @@ class Card:
         inner_layout = BoxLayout(orientation="vertical")
         label_layout = BoxLayout(orientation="vertical", size_hint=(1, 0.2))
         self.form_label = Label(
-            text=self.text, font_size=self.font_size, markup=True
+            text=self.text, font_size=self.font_size, font_name=self.font,
+            markup=True
         )
         self.form_label.color = list(self.text_color)
+        self.form_label.padding = 10, 10
+        self.form_label.text_size = (Window.width, None)
         self.form_label.valign = "top"
         self.form_label.halign = "left"
         label_layout.add_widget(self.form_label)
@@ -397,6 +404,8 @@ class Card:
         for button in self.buttons:
             b = Button(text=button["label"])
             b.bind(on_press=self._button_click(button["target"]))
+            if self.font:
+                b.font_name = self.font
             if "text_size" in button:
                 b.font_size = button["text_size"]
             else:
@@ -456,6 +465,7 @@ class Card:
                 **self.data_store
             )
 
+
     def _enter(self, card):
         """
         Called when the card is displayed to the user. Ensure that any sound
@@ -463,16 +473,7 @@ class Card:
         is scheduled. If the sound attribute is explicitly set to False, then
         any currently playing sound will be stopped.
         """
-        if self.sound:
-            self.player = SoundLoader.load(self.sound)
-            self.player.loop = self.sound_repeat
-            self.player.play()
-            self.player.seek(0)
-        elif self.sound is False:
-            if self.player:
-                self.player.stop()
-                self.player.unload()
-            self.player = None
+        self.app.play_sound(self.sound, self.sound_repeat)
         if self.auto_advance:
             self.auto_event = Clock.schedule_once(
                 self._next_card, self.auto_advance
@@ -550,7 +551,8 @@ class CardApp(App):
     """
 
     def __init__(
-        self, name="A PyperCard Application :-)", data_store=None, stack=None
+        self, name="A PyperCard Application :-)", data_store=None, stack=None,
+        font=None
     ):
         """
         Setup with a clean state.
@@ -567,11 +569,14 @@ class CardApp(App):
         transition.duration = 0.1
         # Will become a reference to play any sounds.
         self.player = None
+        # Custom font.
+        self.font = font
         # The screen manager containing all the screens that make up the stack
         # of cards.
         self.screen_manager = ScreenManager(transition=transition)
         # Contains the card objects which drive the application.
         self.cards = {}
+        self.sound = None
         # Populate with the default stack (if it exists)
         if stack:
             for card in stack:
@@ -590,7 +595,8 @@ class CardApp(App):
             raise ValueError(
                 f"A card with the title '{card.title}` already exists."
             )
-        card.player = self.player
+        card.app = self
+        card.font = self.font
         self.cards[card.title] = card
         screen = card.screen(self.screen_manager, self.data_store)
         self.screen_manager.add_widget(screen)
@@ -607,6 +613,35 @@ class CardApp(App):
             for card in stack:
                 new_card = Card(**card)
                 self.add_card(new_card)
+
+
+    def play_sound(self, filename, repeat):
+
+        def play(time_taken):
+            self.player = SoundLoader.load(filename)
+            self.player.loop = repeat
+            self.player.play()
+            self.player.seek(0)
+
+        if filename and self.sound != filename:    
+            self.sound = filename
+            if self.player:
+                self.player.stop()
+                self.player.unload()
+            Clock.schedule_once(play, 0)
+        elif filename is False:
+            if self.player:
+                self.player.stop()
+                self.player.unload()
+            self.player = None
+
+
+    def stop_sound(self):
+        if self.player:
+            self.player.stop()
+            self.player.unload()
+        self.player = None
+        
 
     def build(self):
         """
