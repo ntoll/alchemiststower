@@ -330,7 +330,7 @@ cards = [
          ]),
     Card("book3", 
          text_size=text_size,
-         text="Another page contained a picture of a serpent circling a glowing orb.\n\nWords explained, \"Knowing and using the power of the serpent means you create new colourful magic and alchemy allowing you to harness the external reservoir of collective knowledge.\"",
+         text="Another page contained a picture of a serpent circling a glowing orb.\n\nWords explained, \"Knowing and using the power of the serpent means you create new colourful magic and alchemy. It allows you to harness the external reservoir of collective knowledge.\"",
          sound="sfx/ticking.wav", sound_repeat=True, buttons=[
             {"label": "◀", "target": "book2"},
             {"label": "▶", "target": "book4"},
@@ -390,7 +390,7 @@ cards = [
          auto_target="red5"),
     Card("red5", 
          text_size=text_size,
-         text="Another page contained a picture of a serpent circling a glowing orb.\n\nWords explained, \"Knowing and using the power of the serpent means you create new colourful magic and alchemy allowing you to harness the external reservoir of collective knowledge.\"",
+         text="Another page contained a picture of a serpent circling a glowing orb.\n\nWords explained, \"Knowing and using the power of the serpent means you create new colourful magic and alchemy. It allows you to harness the external reservoir of collective knowledge.\"",
          auto_advance=24,
          auto_target="red_book"),
     Card("instruct",
