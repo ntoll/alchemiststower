@@ -1,20 +1,21 @@
 The Alchemist's Tower
 =====================
 
-This is a point and click adventure story. My aim was simple: to create
-an experience reminiscent of the mysterious explorations found in old games
-such as Myst.
+This is a point and click adventure story.
+
+My aim was simple: to create an experience reminiscent of the mysterious
+explorations found similar games of the past, such as Myst.
 
 It's also an opportunity for me to try to exercise my PyperCard library (a
-simple shim around Kivy).
+simple shim around Kivy, that works like HyperCard).
 
 The story starts in a dinghy on Lake Zurich, Switzerland.
 
 Installation
 ============
 
-Clone the Got repository (apologies that it's so big, I've been using
-uncompressed game assets).
+Clone the Git repository (apologies that it's so big, I've been using
+uncompressed game assets), or download the and unzip the compressed source.
 
 The Alchemist's Tower only works with Python 3. Create a new virtualenv::
 
@@ -44,4 +45,5 @@ Links for how to do this can be found at the following GitHub issue:
 https://github.com/matham/ffpyplayer/issues/71 (tl;dr - install a bunch of
 system wide packages along with your Python headers, then just
 ``pip install .`` within the virtualenv from the root directory of
-the ``ffpyplayer`` Git repository.
+the ``ffpyplayer`` Git repository - detailed instructions here:
+https://matham.github.io/ffpyplayer/installation.html#linux).
