@@ -91,7 +91,7 @@ def to_unlock(data, form):
 
 def to_dining_room(data, form):
     if data["instructions"]:
-        if data["red_book"]:
+        if not data["locked"]:
             return "finale"
         else:
             return "waiting"
